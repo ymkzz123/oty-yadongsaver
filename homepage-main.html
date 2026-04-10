@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ゆっくりしていってね！！</title>
+    <style>
+        @font-face {
+            font-family: 'Seogung';
+            src: url('./fonts/Suhgung17.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'MulmaruMono';
+            src: url('./fonts/MulmaruMono.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Galmuri7';
+            src: url('./fonts/Galmuri7.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Galmuri11';
+            src: url('./fonts/Galmuri11.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Galmuri14';
+            src: url('./fonts/Galmuri14.woff2') format('woff2');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        body {
+            font-family: 'Galmuri11', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            padding-top: 44px;
+            padding-bottom: 50px;
+            background-image: url("./images/wallpaper.webp");
+            background-repeat: repeat;
+            animation: scroll-bg 400s linear infinite;
+        }
+
+        @keyframes scroll-bg {
+            0% {
+                background-position: 0px 0px;
+            }
+
+            100% {
+                /* 왼쪽 방향으로 이동, 25도 각도 (tan 25도 약 0.466) */
+                background-position: -10000px -4660px;
+            }
+        }
+
+        .centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .top-bar {
+            font-family: 'Seogung', serif;
+            position: fixed;
+            top: 0;
+            left: max(calc((100vw - (100vh * 4 / 3)) / 2), 0px);
+            width: min(100vw, calc(100vh * 4 / 3));
+            background: #ffffe0;
+            text-align: center;
+            padding: 8px 0;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        #pillarbox {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10000;
+            display: block;
+        }
+
+        #pillarbox .pillar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            background-color: #111111;
+        }
+
+        h1 {
+            font-family: 'MulmaruMono', serif;
+        }
+
+        h2 {
+            font-family: 'Seogung', serif;
+        }
+
+        h3 {
+            font-family: 'Galmuri14', serif;
+        }
+
+        h4 {
+            font-family: 'Galmuri11', serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 5px 0;
+        }
+
+        p {
+            font-family: 'Galmuri7', serif;
+        }
+
+        #pillarbox .pillar.left {
+            left: 0;
+            width: max(calc((100vw - (100vh * 4 / 3)) / 2), 0px);
+        }
+
+        #pillarbox .pillar.right {
+            right: 0;
+            width: max(calc((100vw - (100vh * 4 / 3)) / 2), 0px);
+        }
+
+        .info-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.86);
+            border: 4px double #000088;
+            padding: 10px;
+            box-shadow: 5px 5px #8888ff;
+        }
+
+        .info-text {
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.7;
+            padding: 10px;
+            border: 2px dashed #888;
+            background-color: #fffff9;
+        }
+
+        .audio-body {
+            display: flex;
+            align-items: center;
+        }
+
+        .play-btn {
+            background-color: #ffffff;
+            border: 2px solid #5ce4d9;
+            cursor: pointer;
+            font-size: 16px;
+            color: #613df0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            border-radius: 0;
+            transition: background-color 0.1s;
+        }
+
+        .play-btn:hover {
+            background-color: #5ce4d9;
+            color: #ffffff;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .volume-icon {
+            font-size: 14px;
+            margin-right: 5px;
+            user-select: none;
+        }
+
+        .volume-slider {
+            width: 60px;
+            cursor: pointer;
+            accent-color: #613df0;
+        }
+
+        .time-display {
+            font-family: 'Galmuri7', monospace;
+            font-size: 12px;
+            margin: 0 10px;
+            color: #333333;
+            min-width: 75px;
+            text-align: center;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 12px;
+            background-color: #ffffff;
+            border: 2px solid #5ce4d9;
+            border-radius: 0;
+            margin: 0 10px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #613df0;
+            width: 0%;
+            border-radius: 0;
+            transition: width 0.1s linear;
+        }
+
+        .wavy-text {
+            display: inline-block;
+            white-space: pre-wrap;
+        }
+
+        .wavy-text span {
+            display: inline-block;
+            animation: infinity-wiggle 3s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.1s);
+        }
+
+        @keyframes infinity-wiggle {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            12.5% {
+                transform: translate(2px, -2px);
+            }
+
+            25% {
+                transform: translate(4px, 0);
+            }
+
+            37.5% {
+                transform: translate(2px, 2px);
+            }
+
+            50% {
+                transform: translate(0, 0);
+            }
+
+            62.5% {
+                transform: translate(-2px, -2px);
+            }
+
+            75% {
+                transform: translate(-4px, 0);
+            }
+
+            87.5% {
+                transform: translate(-2px, 2px);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        .retro-window {
+            background-color: #ffffff;
+            border: 3px solid #5ce4d9;
+            border-radius: 0;
+            width: 80%;
+            max-width: 700px;
+            margin: 20px auto;
+            position: relative;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        .retro-title-bar {
+            background-color: #613df0;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            border-bottom: 3px solid #5ce4d9;
+            font-size: 13px;
+        }
+
+        .retro-title-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+        }
+
+        .retro-title-icon {
+            width: 10px;
+            height: 10px;
+            background-color: #3b28b5;
+            border: 1px solid #ffffff;
+            display: inline-block;
+        }
+
+        .retro-title-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .retro-window-btn {
+            background-color: #ffffff;
+            border: 2px solid #5ce4d9;
+            color: #613df0;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            font-weight: bold;
+            font-family: sans-serif;
+            transition: all 0.1s;
+            line-height: 1;
+        }
+
+        .retro-window-btn:hover {
+            background-color: #5ce4d9;
+            color: #ffffff;
+        }
+
+        .retro-content {
+            padding: 12px 16px;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background-color: #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+
+        .gallery-slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 80%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .gallery-slide p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .gallery-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .gallery-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .gallery-btn.prev {
+            left: 10px;
+        }
+
+        .gallery-btn.next {
+            right: 10px;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: max(calc((100vw - (100vh * 4 / 3)) / 2), 0px);
+            width: min(100vw, calc(100vh * 4 / 3));
+            height: 38px;
+            background-color: #ffffff;
+            border-top: 3px solid #5ce4d9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+            box-sizing: border-box;
+            z-index: 9999;
+            font-family: 'Galmuri11', sans-serif;
+        }
+
+        .taskbar-left {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            gap: 6px;
+        }
+
+        .start-btn {
+            background-color: #613df0;
+            color: #ffffff;
+            border: 2px solid #5ce4d9;
+            height: 28px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+            transition: all 0.1s;
+        }
+
+        .start-btn:hover {
+            background-color: #5ce4d9;
+            color: #613df0;
+            border-color: #613df0;
+        }
+
+        .taskbar-divider {
+            width: 2px;
+            height: 24px;
+            background-color: #613df0;
+            opacity: 0.2;
+            margin: 0 4px;
+        }
+
+        .taskbar-link {
+            text-decoration: none;
+            color: #333333;
+            height: 28px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+            border: 2px solid transparent;
+            transition: all 0.1s;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .taskbar-link:hover {
+            border: 2px solid #5ce4d9;
+            background-color: rgba(92, 228, 217, 0.1);
+            color: #613df0;
+        }
+
+        .taskbar-right {
+            display: flex;
+            align-items: center;
+            padding-right: 10px;
+            height: 100%;
+        }
+
+        .taskbar-time {
+            font-size: 12px;
+            color: #613df0;
+            border: 2px solid #5ce4d9;
+            padding: 3px 10px;
+            background-color: #f7f7f7;
+            font-family: 'Galmuri7', monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar">
+        <span>[SYSTEM] 방문을 환영합니다!</span>
+    </div>
+
+    <div id="pillarbox">
+        <div class="pillar left"></div>
+        <div class="pillar right"></div>
+    </div>
+
+    <div class="centered">
+        <h1>오태연의 웹쉽터에 오신 것을 환영합니다!</h1>
+        <h2>부디 편히 계시지요...</h2>
+    </div>
+
+    <div class="info-container">
+        <div class="info-text">
+            <h3>
+                <font color="#778899" size="1">･ﾟ･...*★*｡.</font>
+                <span class="wavy-text">천천히 알아가볼까요?</span>
+                <font color="#778899" size="1">.｡★*...･ﾟ･</font>
+            </h3>
+        </div>
+    </div>
+
+    <div class="retro-window">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>기본 정보</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+
+        <div class="retro-content">
+            <h4>
+                이름: 오태연<br>
+                출신 지역: 대전광역시 대덕구 신탄진<br>
+                출신 학교: 신탄진초등학교, 신탄진중학교, 대전대신고등학교
+            </h4>
+        </div>
+    </div>
+
+    <div class="retro-window post1">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>사진첩 (어렸을 때의 사진들)</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+        <div class="retro-content">
+            <div class="gallery-container">
+                <button class="gallery-btn prev">❮</button>
+                <button class="gallery-btn next">❯</button>
+
+                <!-- 사진 -->
+                <div class="gallery-slide active">
+                    <img src="./images/img-young1.jpg" alt="NOT FOUND">
+                    <h3>몇 살 때였을까요? 어쨌든 리즈시절이네요</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-young2.jpg" alt="NOT FOUND">
+                    <h3>처음 제주도에 갔을 때...</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-young3.jpg" alt="NOT FOUND">
+                    <h3>첫 공항은 설렜어요! ...뭐 지금도 비슷하지만</h3>
+                </div>
+            </div>
+            <p style="margin-top:20px; font-weight:bold;">어렸을 때의 사진들이에요!</p>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="info-container">
+        <div class="info-text">
+            <h3>
+                <font color="#778899" size="1">･ﾟ･...*★*｡.</font>
+                <span class="wavy-text">이 사람은 무엇을 좋아할까요?</span>
+                <font color="#778899" size="1">.｡★*...･ﾟ･</font>
+            </h3>
+        </div>
+    </div>
+
+    <div class="retro-window">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>취미-1</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+
+        <div class="retro-content">
+            <h4>
+                제가 가진 가장 큰 취미는 사진과 여행이 있습니다!<br>
+                최근에는 일본에서 구매한 54년식 Canon IV Sb改로 필름 사진을 자주 찍고 있는데,<br>
+                현상이 끝나는 대로 편집해서 instagram 계정에 투고하고 있습니다!
+            </h4>
+        </div>
+    </div>
+
+    <div class="retro-window">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>취미-2</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+
+        <div class="retro-content">
+            <h4>
+                또한 제가 좋아하는 인디 장르의 음악을 디깅하여 음반 수집도 하고 있고,<br>
+                시간이 날 때마다 작곡도 즐기고 있습니다!<br>
+                (아래 단락에 데모곡이 있어요)
+            </h4>
+        </div>
+    </div>
+
+    <div class="retro-window">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>스포츠</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+
+        <div class="retro-content">
+            <h4>
+                좋아하는 스포츠로는 야구와 F1이 있는데요,<br>
+                KBO는 한화 이글스, NPB는 요미우리 자이언츠를 좋아하며<br>
+                F1은 스쿠데리아 페라리를 응원하고 있습니다!
+            </h4>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="info-container">
+        <div class="info-text">
+            <h3>
+                <font color="#778899" size="1">･ﾟ･...*★*｡.</font>
+                <span class="wavy-text">최근 작업물</span>
+                <font color="#778899" size="1">.｡★*...･ﾟ･</font>
+            </h3>
+        </div>
+    </div>
+
+    <!-- 오디오 플레이어 이식 -->
+    <div class="retro-window">
+        <!-- 타이틀 바 -->
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>최근 작곡한 데모</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+
+        <!-- 플레이어 컨트롤 영역 -->
+        <div class="retro-content">
+            <div
+                style="margin-bottom: 12px; font-weight: bold; color: #613df0; display: flex; align-items: center; gap: 8px;">
+                <span>♬</span> White night demo.m4a
+            </div>
+            <div class="audio-body">
+                <button class="play-btn" id="playBtn" title="재생">▶</button>
+                <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+
+                <div class="progress-container" id="progressContainer" title="탐색">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="volume-container" title="볼륨 조절">
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="retro-window post1">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>사진첩 (필름)</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+        <div class="retro-content">
+            <div class="gallery-container">
+                <button class="gallery-btn prev">❮</button>
+                <button class="gallery-btn next">❯</button>
+
+                <!-- 사진 -->
+                <div class="gallery-slide active">
+                    <img src="./images/img-filmkhu1.jpg" alt="NOT FOUND">
+                    <h3>경희대학교, 2026년 3월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-filmkhu2.jpg" alt="NOT FOUND">
+                    <h3>경희대학교, 2026년 3월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-film1.jpg" alt="NOT FOUND">
+                    <h3>시바공원, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-film2.jpg" alt="NOT FOUND">
+                    <h3>이이다바시, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-film3.jpg" alt="NOT FOUND">
+                    <h3>선샤인시티, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-film4.jpg" alt="NOT FOUND">
+                    <h3>오다이바 텔레콤센터, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-film5.jpg" alt="NOT FOUND">
+                    <h3>오에도선 역내, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-film6.jpg" alt="NOT FOUND">
+                    <h3>아키하바라, 2026년 1월</h3>
+                </div>
+            </div>
+            <p style="margin-top:20px; font-weight:normal;">Camera: Canon IV Sb改(4Sb改)<br>
+                Lens: Industar-50mm f/3.5</p>
+        </div>
+    </div>
+
+    <div class="retro-window post1">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>사진첩 (디지털)</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+        <div class="retro-content">
+            <div class="gallery-container">
+                <button class="gallery-btn prev">❮</button>
+                <button class="gallery-btn next">❯</button>
+
+                <!-- 사진 -->
+                <div class="gallery-slide active">
+                    <img src="./images/img-digikhu1.jpg" alt="NOT FOUND">
+                    <h3>경희대학교, 2026년 4월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-digi1.jpg" alt="NOT FOUND">
+                    <h3>아키하바라, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-digi2.jpg" alt="NOT FOUND">
+                    <h3>아키하바라, 2026년 1월</h3>
+                </div>
+                <div class="gallery-slide">
+                    <img src="./images/img-digi3.jpg" alt="NOT FOUND">
+                    <h3>시모키타자와, 2026년 1월</h3>
+                </div>
+            </div>
+            <p style="margin-top:20px; font-weight:normal;">Camera: Canon 90D<br>
+                Lens: Sigma 17-50mm f/2.8 EX DC OS HSM</p>
+        </div>
+    </div>
+
+    <!-- 오디오 파일 -->
+    <audio id="realAudio" src="./audios/[demo] White night.m4a"></audio>
+
+    <br>
+    <div class="retro-window">
+        <div class="retro-title-bar">
+            <div class="retro-title-left">
+                <span class="retro-title-icon"></span>
+                <span>연락처</span>
+            </div>
+            <div class="retro-title-controls">
+                <div class="retro-window-btn">_</div>
+                <div class="retro-window-btn">□</div>
+                <div class="retro-window-btn" onclick="this.closest('.retro-window').style.display='none'">✕</div>
+            </div>
+        </div>
+
+        <div class="retro-content">
+            <h4>
+                e-mail: zbezda00@gmail.com / zbezda00@khu.ac.kr<br>
+                H.P.: 010-5859-3427
+            </h4>
+        </div>
+    </div>
+    <p>🄫 2026 @oh.tyn</p>
+
+    <!-- 하단 고정 작업표시줄 -->
+    <div class="taskbar">
+        <div class="taskbar-left">
+            <!-- 윈도우 스타일의 시작 버튼 (클릭 시 맨 위로) -->
+            <div class="start-btn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">▶ 시작</div>
+
+            <div class="taskbar-divider"></div>
+
+            <!-- 사용자가 추후 링크를 붙여넣기 위한 버튼들 -->
+            <a href="https://www.instagram.com/oh.tyn/" class="taskbar-link">イ Instagram</a>
+            <a href="https://waveroad.bandcamp.com/" class="taskbar-link">バ Bandcamp</a>
+            <a href="https://unsplash.com/ja/@ohtaeyeon" class="taskbar-link">ア Unsplash</a>
+        </div>
+
+        <div class="taskbar-right">
+            <div class="taskbar-time" id="taskbarTime">AM 12:00</div>
+        </div>
+    </div>
+
+    <!-- 자바스크립트 영역 -->
+    <script>
+        document.querySelectorAll('.wavy-text').forEach(element => {
+            const text = element.innerText;
+            element.innerHTML = '';
+
+            text.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                if (char === ' ') {
+                    span.innerHTML = '&nbsp;';
+                }
+                span.style.setProperty('--i', index);
+                element.appendChild(span);
+            });
+        });
+
+        document.querySelectorAll('.post1').forEach(post => {
+            const container = post.querySelector('.gallery-container');
+            if (!container) return;
+
+            const images = container.querySelectorAll('.gallery-slide');
+            const prevBtn = container.querySelector('.prev');
+            const nextBtn = container.querySelector('.next');
+            let currentIndex = 0;
+
+            function showImage(index) {
+                images.forEach(img => img.classList.remove('active'));
+
+                if (index >= images.length) {
+                    currentIndex = 0;
+                } else if (index < 0) {
+                    currentIndex = images.length - 1;
+                } else {
+                    currentIndex = index;
+                }
+
+                if (images[currentIndex]) {
+                    images[currentIndex].classList.add('active');
+                }
+            }
+
+            if (prevBtn) prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
+            if (nextBtn) nextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+        });
+
+        const audio = document.getElementById('realAudio');
+        const playBtn = document.getElementById('playBtn');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        let isPlaying = false;
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                playBtn.innerText = '▶';
+            } else {
+                audio.play();
+                playBtn.innerText = '⏸';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            const current = audio.currentTime;
+            const duration = audio.duration;
+
+            timeDisplay.innerText = `${formatTime(current)} / ${formatTime(duration)}`;
+
+            if (duration > 0) {
+                const percent = (current / duration) * 100;
+                progressFill.style.width = `${percent}%`;
+            }
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            timeDisplay.innerText = `0:00 / ${formatTime(audio.duration)}`;
+        });
+
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = rect.width;
+            const clickRatio = clickX / width;
+
+            audio.currentTime = clickRatio * audio.duration;
+
+            if (!isPlaying) {
+                audio.play();
+                playBtn.innerText = '⏸';
+                isPlaying = true;
+            }
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+        });
+
+        audio.addEventListener('ended', () => {
+            isPlaying = false;
+            playBtn.innerText = '▶';
+            progressFill.style.width = '0%';
+            audio.currentTime = 0;
+        });
+
+        const timeElement = document.getElementById('taskbarTime');
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            if (timeElement) {
+                timeElement.innerText = `${ampm} ${hours}:${minutes}`;
+            }
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+
+</html>
